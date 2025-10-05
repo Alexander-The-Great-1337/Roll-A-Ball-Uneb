@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     private Renderer render;
     [SerializeField] private float increaseSize = 0.1f;
     [SerializeField] private float speedDecreaseRate = 0.05f;
-    [SerializeField] private Image EnergyBar;
+    [SerializeField] private Slider EnergyBar;
 
     [Header("Movement")]
     [SerializeField] private float speed;
@@ -33,22 +33,32 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        if (GameManager._instance != null)
+        {
+            GameManager._instance.RegisterPlayer(this);
+        }
+
         counter = 0;
         render.material.SetFloat("_Metallic", metallicValue);
         initialScale = transform.localScale.x;
-
-        EnergyBar.fillAmount = 1f;
+        if (EnergyBar != null)
+        {
+            EnergyBar.value = 1f;
+        }
+        Time.timeScale = 1f;
     }
 
     void Update()
     {
-        metallicValue += metallicDecreaseLight * Time.deltaTime;
-        render.material.SetFloat("_Metallic", metallicValue);
 
-        EnergyBar.fillAmount = Mathf.Max(EnergyBar.fillAmount - metallicDecreaseLight * Time.deltaTime, 0f);
-
-        float targetScale = Mathf.Lerp(initialScale, minScale, 1f - EnergyBar.fillAmount);
-        transform.localScale = new Vector3(targetScale, targetScale, targetScale);
+        if (EnergyBar != null)
+        {
+            metallicValue += metallicDecreaseLight * Time.deltaTime;
+            render.material.SetFloat("_Metallic", metallicValue);
+            EnergyBar.value = Mathf.Max(EnergyBar.value - metallicDecreaseLight * Time.deltaTime, 0f);
+            float targetScale = Mathf.Lerp(initialScale, minScale, 1f - EnergyBar.value);
+            transform.localScale = new Vector3(targetScale, targetScale, targetScale);
+        }
 
         if (metallicValue >= 1.0f)
         {
@@ -79,6 +89,7 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("PickUp"))
         {
+
             counter++;
 
             transform.localScale *= (1f + increaseSize);
@@ -86,7 +97,7 @@ public class PlayerController : MonoBehaviour
             speed *= (1f - speedDecreaseRate);
 
             metallicValue = Mathf.Max(metallicValue - metallicIncreaseLight, 0f);
-            EnergyBar.fillAmount = Mathf.Min(EnergyBar.fillAmount + metallicIncreaseLight, 1f);
+            EnergyBar.value = Mathf.Min(EnergyBar.value + metallicIncreaseLight, 1f);
 
             Destroy(other.gameObject);
         }

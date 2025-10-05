@@ -1,19 +1,27 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager _instance;
 
     [Header("References")]
-    [SerializeField] private PlayerController playerController;
     [SerializeField] private TextMeshProUGUI countText;
-    [SerializeField] private TextMeshProUGUI winText;
-    [SerializeField] private TextMeshProUGUI gameOverText;
+    [SerializeField] private Transform winContainer;
+    [SerializeField] private Transform gameOverContainer;
     [SerializeField] private TextMeshProUGUI timerText;
     [SerializeField] private Transform pickUpManager;
+    [SerializeField] private Button winRestartButton;
+    [SerializeField] private Button winQuitButton;
+    [SerializeField] private Button gameOverRestartButton;
+    [SerializeField] private Button gameOverQuitButton;
+
     [SerializeField] private float roundTime = 60.0f;
     [SerializeField] private int maxPickUps = 34;
+
+    private PlayerController playerController;
 
     private void Awake()
     {
@@ -26,17 +34,36 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        DontDestroyOnLoad(gameObject);
-        winText.gameObject.SetActive(false);
-        gameOverText.gameObject.SetActive(false);
+        //DontDestroyOnLoad(gameObject);
+        winContainer.gameObject.SetActive(false);
+        gameOverContainer.gameObject.SetActive(false);
     }
 
     void Start()
     {
         countText.text = GetFormatedScore();
+
+        gameOverRestartButton.onClick.AddListener(RestartLevel);
+        gameOverQuitButton.onClick.AddListener(GoToMenu);
+        winRestartButton.onClick.AddListener(RestartLevel);
+        winQuitButton.onClick.AddListener(GoToMenu);
     }
 
-    // Update is called once per frame
+    public void RegisterPlayer(PlayerController player)
+    {
+        playerController = player;
+    }
+
+    private void RestartLevel()
+    {
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.name);
+    }
+    private void GoToMenu()
+    {
+        SceneManager.LoadScene("Menu");
+    }
+
     void Update()
     {
         CheckWinCondition();
@@ -66,13 +93,13 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        gameOverText.gameObject.SetActive(true);
+        gameOverContainer.gameObject.SetActive(true);
         Time.timeScale = 0.0f;
     }
 
     public void Win()
     {
-        winText.gameObject.SetActive(true);
+        winContainer.gameObject.SetActive(true);
         Time.timeScale = 0.0f;
     }
 
