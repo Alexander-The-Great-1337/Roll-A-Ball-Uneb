@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
@@ -6,21 +6,24 @@ public class PlayerController : MonoBehaviour
     [Header("References")]
     private Rigidbody rb;
     private Renderer render;
-    [SerializeField] private float increaseSize = .1f;
+    [SerializeField] private float increaseSize = 0.1f;
     [SerializeField] private float speedDecreaseRate = 0.05f;
-    [SerializeField] private Scrollbar EnergyBar;
+    [SerializeField] private Image EnergyBar;
 
     [Header("Movement")]
     [SerializeField] private float speed;
     private float horizontalInput;
-    private float vertticalInput;
+    private float verticalInput;
 
+    [Header("Energy & Visuals")]
     private float metallicValue = 0f;
     [SerializeField] private float metallicDecreaseLight = 0.2f;
     [SerializeField] private float metallicIncreaseLight = 0.2f;
     [SerializeField] private float impulseForce = 0.1f;
 
     private int counter;
+    [SerializeField] private float minScale = 0.2f;
+    private float initialScale;
 
     void Awake()
     {
@@ -32,17 +35,20 @@ public class PlayerController : MonoBehaviour
     {
         counter = 0;
         render.material.SetFloat("_Metallic", metallicValue);
+        initialScale = transform.localScale.x;
+
+        EnergyBar.fillAmount = 1f;
     }
 
     void Update()
     {
         metallicValue += metallicDecreaseLight * Time.deltaTime;
-
         render.material.SetFloat("_Metallic", metallicValue);
 
-        Debug.Log("Metallic Value: " + metallicValue);
+        EnergyBar.fillAmount = Mathf.Max(EnergyBar.fillAmount - metallicDecreaseLight * Time.deltaTime, 0f);
 
-        EnergyBar.size -= metallicDecreaseLight * Time.deltaTime;
+        float targetScale = Mathf.Lerp(initialScale, minScale, 1f - EnergyBar.fillAmount);
+        transform.localScale = new Vector3(targetScale, targetScale, targetScale);
 
         if (metallicValue >= 1.0f)
         {
@@ -56,23 +62,17 @@ public class PlayerController : MonoBehaviour
     void HandlePlayerInput()
     {
         horizontalInput = Input.GetAxis("Horizontal");
-        vertticalInput = Input.GetAxis("Vertical");
+        verticalInput = Input.GetAxis("Vertical");
     }
 
     void HandleMovement()
-    {
-        Move();
-    }
-
-    void Move()
     {
         rb.AddForce(speed * GetDirection().normalized * Time.deltaTime);
     }
 
     private Vector3 GetDirection()
     {
-        return new Vector3(horizontalInput, 0f, vertticalInput);
-
+        return new Vector3(horizontalInput, 0f, verticalInput);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -80,12 +80,13 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("PickUp"))
         {
             counter++;
+
             transform.localScale *= (1f + increaseSize);
 
             speed *= (1f - speedDecreaseRate);
 
-            metallicValue -= metallicIncreaseLight;
-            EnergyBar.size += metallicIncreaseLight;
+            metallicValue = Mathf.Max(metallicValue - metallicIncreaseLight, 0f);
+            EnergyBar.fillAmount = Mathf.Min(EnergyBar.fillAmount + metallicIncreaseLight, 1f);
 
             Destroy(other.gameObject);
         }
