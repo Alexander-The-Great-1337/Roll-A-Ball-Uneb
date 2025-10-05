@@ -25,7 +25,7 @@ Jogue diretamente no navegador: [Roll a Ball UNEB no Unity Play](https://play.un
 ## ⚙️ Controles
 
 - **W / A / S / D** → Mover a bola  
-- **Objetivo** → Coletar 34 itens antes do tempo acabar  
+- **Objetivo** → Coletar 15 itens antes do tempo acabar  
 
 ---
 
