@@ -12,12 +12,12 @@ Controle a bola usando **WASD** para coletar **34 itens** antes que o tempo term
 
 ## 🖼️ Print do Jogo
 
-![Gameplay Screenshot](assets/rollaball-screenshot.png)  
+![Gameplay Screenshot](Assets/assets/rollaball-screenshot.png)
 ---
 
 ## 🎥 Gameplay GIF
 
-![Gameplay GIF](assets/rollaball.gif)  
+![Gameplay GIF](Assets/assets/rollaball.gif)
 ---
 
 ## ⚙️ Controles
