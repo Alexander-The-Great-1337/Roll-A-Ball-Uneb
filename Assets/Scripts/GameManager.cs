@@ -3,54 +3,84 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [Header("References")]
-    [SerializeField] PlayerController playerController;
-    [SerializeField] TextMeshProUGUI countText;
-    [SerializeField] TextMeshProUGUI winText;
-    [SerializeField] Transform pickUpManager;
+    public static GameManager _instance;
 
-    private int pickUpAmountRemain;
+    [Header("References")]
+    [SerializeField] private PlayerController playerController;
+    [SerializeField] private TextMeshProUGUI countText;
+    [SerializeField] private TextMeshProUGUI winText;
+    [SerializeField] private TextMeshProUGUI gameOverText;
+    [SerializeField] private TextMeshProUGUI timerText;
+    [SerializeField] private Transform pickUpManager;
+    [SerializeField] private float roundTime = 60.0f;
+    [SerializeField] private int maxPickUps = 34;
 
     private void Awake()
     {
+        if (_instance == null)
+        {
+            _instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+        DontDestroyOnLoad(gameObject);
         winText.gameObject.SetActive(false);
+        gameOverText.gameObject.SetActive(false);
     }
 
     void Start()
     {
         countText.text = GetFormatedScore();
-        GetPickUpItemsAmount();
     }
 
     // Update is called once per frame
     void Update()
     {
         CheckWinCondition();
+            
+        if (roundTime > 0.0f)
+        {
+            roundTime -= Time.deltaTime;
+            if (roundTime < 0.0f)
+            {
+                roundTime = 0.0f;
+                TimeIsUp();
+            }
+        }
         countText.text = GetFormatedScore();
+        timerText.text = $"Time: {roundTime:F2}";
     }
 
-    private void GetPickUpItemsAmount()
+    private void TimeIsUp()
     {
-        foreach(Transform child in pickUpManager)
-        {
-            if (child.gameObject.activeSelf)
-                pickUpAmountRemain++;
-        }
-    }
-
-    private void CheckWinCondition()
-    {
-        bool pickUpAllItems = playerController.GetCounter() >= pickUpAmountRemain;
-
-        if (pickUpAllItems)
-        {
-            winText.gameObject.SetActive(true);
-            Time.timeScale = 0f;
-        }
+        GameOver();
     }
 
     private string GetFormatedScore()
     {
-        return $"Score: {playerController.GetCounter()}";
+        return $"{playerController.GetCounter()}/{maxPickUps}";
+    }
+
+    public void GameOver()
+    {
+        gameOverText.gameObject.SetActive(true);
+        Time.timeScale = 0.0f;
+    }
+
+    public void Win()
+    {
+        winText.gameObject.SetActive(true);
+        Time.timeScale = 0.0f;
+    }
+
+    private void CheckWinCondition()
+    {
+        if (playerController.GetCounter() >= maxPickUps)
+        {
+            Win();
+        }
     }
 }
