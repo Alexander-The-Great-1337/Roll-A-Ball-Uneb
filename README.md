@@ -10,6 +10,8 @@ Controle a bola usando **WASD** para coletar **34 itens** antes que o tempo term
 
 ---
 
+Jogue diretamente no navegador: [Roll a Ball UNEB no Unity Play](https://play.unity.com/en/games/40142ebf-445a-4b4e-8abf-6fe8eee7b1d1/roll-a-ball-uneb)
+
 ## 🖼️ Print do Jogo
 
 ![Gameplay Screenshot](Assets/assets/rollaball-screenshot.png)
